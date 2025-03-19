@@ -39,6 +39,23 @@ func main() {
 		distance = distance + absdistance(xs[i], ys[i])
 	}
 	log.Printf("The total distance is %d", distance)
+
+	// Next, look for similarities
+	// First, count how many occurrences of each number are in ys
+	counts := make(map[int]int)
+	for _, val := range ys {
+		if elem, ok := counts[val]; ok {
+			counts[val] = elem + 1
+		} else {
+			counts[val] = 1
+		}
+	}
+	// Now use the counts as multipliers on xs
+	sim := 0
+	for _, val := range xs {
+		sim += val * counts[val]
+	}
+	log.Printf("The final similarity is %d", sim)
 }
 
 func insert(s []int, val int) []int {
