@@ -4,8 +4,9 @@ import (
 	"bufio"
 	"log"
 	"os"
-	"regexp"
-	"strconv"
+	"strings"
+
+	"cowlet.org/advent2024go/day3/memory"
 )
 
 func main() {
@@ -17,27 +18,16 @@ func main() {
 		log.Fatalf("os.Open: %v", err)
 	}
 
-	var mulexp = regexp.MustCompile(`mul\(([0-9]+),([0-9]+)\)`)
-	total := 0
-
+	var lines []string
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
-		line := scanner.Text()
+		lines = append(lines, scanner.Text())
 		//log.Printf("line is: %s", line)
-		matches := mulexp.FindAllStringSubmatch(line, -1)
-		for _, s := range matches {
-			//log.Printf("First match is %v", s)
-			x, err := strconv.Atoi(s[1])
-			if err != nil {
-				log.Fatalf("strconv.Atoi: %v", err)
-			}
-			y, err := strconv.Atoi(s[2])
-			if err != nil {
-				log.Fatalf("strconv.Atoi: %v", err)
-			}
-			//log.Printf("Found %d * %d", x, y)
-			total += x * y
-		}
 	}
-	log.Printf("Final total is %d", total)
+
+	text := strings.Join(lines, "")
+	var prog memory.Program
+	prog.Parse(text)
+	//log.Printf("%v", prog)
+	log.Printf("Program returns %d", prog.Execute())
 }
