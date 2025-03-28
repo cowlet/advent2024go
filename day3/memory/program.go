@@ -88,7 +88,7 @@ func (prog *Program) Parse(s string) {
 	}
 }
 
-func (p *Program) next() int {
+func (p *Program) next() *Instruction {
 	var compare []Instruction
 	if len(p.muls) > 0 {
 		compare = append(compare, p.muls[0])
@@ -103,7 +103,7 @@ func (p *Program) next() int {
 	next := slices.MinFunc(compare, func(a, b Instruction) int {
 		return cmp.Compare(a.Pos(), b.Pos())
 	})
-	return next.Pos()
+	return &next
 }
 
 func (p *Program) Execute() int {
@@ -115,19 +115,19 @@ func (p *Program) Execute() int {
 		if len(p.muls) == 0 {
 			return total
 		}
-		next := p.next()
+		next := *p.next()
 
 		// For each type of instruction, execute it then consume it
-		if next == p.muls[0].pos {
+		switch next.(type) {
+		case Mul:
 			if on {
 				total += p.muls[0].x * p.muls[0].y
 			}
 			p.muls = p.muls[1:]
-		} else if next == p.dos[0].pos {
+		case Do:
 			on = true
 			p.dos = p.dos[1:]
-		} else {
-			// Must be dont
+		case Dont:
 			on = false
 			p.donts = p.donts[1:]
 		}
