@@ -45,7 +45,7 @@ func Validate(book string, rules []Rule) ([]int, bool) {
 
 	for _, r := range rules {
 		if !passes(r, nos) {
-			return nil, false
+			return nos, false
 		}
 	}
 	return nos, true
@@ -65,4 +65,20 @@ func passes(r Rule, pgs []int) bool {
 		return true // actual pass
 	}
 	return false // a must come after b
+}
+
+func Fix(pgs []int, rules []Rule) {
+	for restart := true; restart; {
+		restart = false
+		for _, r := range rules {
+			if !passes(r, pgs) {
+				x := slices.Index(pgs, r.a)
+				y := slices.Index(pgs, r.b)
+				pgs[x] = r.b
+				pgs[y] = r.a
+				restart = true
+				break
+			}
+		}
+	}
 }
