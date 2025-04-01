@@ -33,7 +33,27 @@ func NewSearch(text string, lines []string) *Search {
 	return &s
 }
 
-func (s *Search) Count() int {
+// Count examples of MAS crossing itself
+func (s *Search) CountXMas() int {
+	total := 0
+	// Look for As first, but must be 1 row and 1 col in from the edge
+	// (to give space for the Ms and Ses)
+	for i := 1; i < s.nr-1; i++ {
+		for j := 1; j < s.nc-1; j++ {
+			if s.Rows[i][j] == 'A' {
+				if ((s.Rows[i-1][j-1] == 'M' && s.Rows[i+1][j+1] == 'S') ||
+					(s.Rows[i-1][j-1] == 'S' && s.Rows[i+1][j+1] == 'M')) &&
+					((s.Rows[i-1][j+1] == 'M' && s.Rows[i+1][j-1] == 'S') ||
+						(s.Rows[i-1][j+1] == 'S' && s.Rows[i+1][j-1] == 'M')) {
+					total += 1
+				}
+			}
+		}
+	}
+	return total
+}
+
+func (s *Search) CountNormal() int {
 	a := s.countRows()
 	b := s.countCols()
 	c := s.countLDiag()

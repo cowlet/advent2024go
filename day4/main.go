@@ -24,5 +24,6 @@ func main() {
 	}
 
 	s := grid.NewSearch("XMAS", lines)
-	log.Printf("Total number of XMASes is %d", s.Count())
+	log.Printf("Total number of XMASes is %d", s.CountNormal())
+	log.Printf("Total number of X-MASes is %d", s.CountXMas())
 }
