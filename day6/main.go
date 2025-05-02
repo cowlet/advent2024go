@@ -25,4 +25,5 @@ func main() {
 
 	r := room.NewRoom(lines)
 	r.Print()
+	log.Printf("The guard visited %d locations", r.CountGuard())
 }
