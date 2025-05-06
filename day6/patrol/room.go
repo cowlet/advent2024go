@@ -46,7 +46,10 @@ func NewRoom(lines []string) *Room {
 	}
 
 	log.Print("Running guard...")
-	r.runGuard()
+	loop := r.runGuard()
+	if loop {
+		log.Printf("Warning: loop detected in guard path.")
+	}
 	return &r
 }
 
@@ -88,7 +91,7 @@ func (r *Room) Print() {
 	log.Printf("\n%s", string(s))
 }
 
-func (r *Room) runGuard() {
+func (r *Room) runGuard() bool {
 	var i, j int
 	var c rune
 	for {
@@ -127,10 +130,14 @@ func (r *Room) runGuard() {
 			}
 		}
 		if i < 0 || i >= r.nr || j < 0 || j >= r.nc {
-			log.Printf("Guard exited at (%d, %d)\n", i, j)
-			return
+			//log.Printf("Guard exited at (%d, %d)\n", i, j)
+			return false
 		}
 		next := Coord{i, j, c}
+		if slices.Contains(r.g.path, next) {
+			//log.Printf("Detected loop at %v\n", next)
+			return true
+		}
 		r.g.path = append([]Coord{next}, r.g.path...)
 	}
 }
@@ -148,4 +155,28 @@ func (r *Room) CountGuard() int {
 
 	}
 	return len(uniques)
+}
+
+func (r *Room) BlockGuard() int {
+	var blockers []Coord
+	last := len(r.g.path) - 1
+	for i := range r.g.path {
+		if i == last {
+			break
+		}
+		// Make a copy with the ith step as a new obstacle
+		obs := Coord{r.g.path[i].x, r.g.path[i].y, 'O'}
+		if slices.Contains(blockers, obs) {
+			continue
+		}
+		// Initial position for Guard only, so we can run it
+		copy := Room{r.nr, r.nc, append(r.obs, obs), Guard{r.g.path[last:]}}
+		loop := copy.runGuard()
+		if loop {
+			//log.Printf("Obs blocks at %v", r.g.path[i])
+			//copy.Print()
+			blockers = append(blockers, obs)
+		}
+	}
+	return len(blockers)
 }
